@@ -45,11 +45,27 @@
     // نظام الأمان الجديد: وقت عشوائي بين 3 و 7 ثواني
     const getRandomStepDelay = () => Math.floor(Math.random() * (7000 - 3000 + 1) + 3000);
 
-    const checkLicense = () => {
-        if (get('activated-2') === 'true') return true;
+const checkLicense = () => {
+        const isActivated = get('activated') === 'true';
+        const userKey = get('user_key'); // المفتاح اللي استخدمه المستخدم للتفعيل
+
+        // ميزة الطرد: إذا كان مفعل بس مفتاحه مو موجود في الـ JSON الجديد.. اطرده
+        if (isActivated && userKey) {
+            if (remoteConfig.valid_keys && !remoteConfig.valid_keys.includes(userKey)) {
+                save('activated', 'false'); // إلغاء التفعيل فوراً
+                location.reload();
+                return false;
+            }
+            return true;
+        }
+
+        // نظام الفترة التجريبية (3 دقائق)
         let trialStart = get('trial_start');
         if (!trialStart) { trialStart = Date.now(); save('trial_start', trialStart); }
-        if ((Date.now() - trialStart) / 1000 > 180) { showLockScreen(); return false; }
+        if ((Date.now() - trialStart) / 1000 > 180) { 
+            showLockScreen(); 
+            return false; 
+        }
         return true;
     };
 
