@@ -1,6 +1,9 @@
 {
-  "kill_switch": "true",
-  "global_message": "النسخة قيد Dالتجربه عطونا راييييكم بالدسكورد",
-  "valid_keys": ["NEW-SECRET-KEY-9349"]
-  "valid_keys": ["NEWKEY-FJMR9349"]
+  "kill_switch": false,
+  "global_message": "BDRKW PRO V20",
+  "valid_keys": [
+    "BDRKW-PRO-2026",
+    "NEWKEY-FJMR9349",
+    "ADMIN-BDRKW",
+  ]
 }
