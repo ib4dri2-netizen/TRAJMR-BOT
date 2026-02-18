@@ -51,11 +51,14 @@ if (get('activated') === 'true' && userKey && remoteConfig.valid_keys) {
     }
 }
     const checkLicense = () => {
-       save('activated', 'true');
-save('user_key', document.getElementById('key-input').value);
+        if (get('activated') === 'true') return true;
+        
         let trialStart = get('trial_start');
         if (!trialStart) { trialStart = Date.now(); save('trial_start', trialStart); }
-        if ((Date.now() - trialStart) / 1000 > 180) { showLockScreen(); return false; }
+        if ((Date.now() - trialStart) / 1000 > 180) { 
+            showLockScreen(); 
+            return false; 
+        }
         return true;
     };
     function showLockScreen() {
