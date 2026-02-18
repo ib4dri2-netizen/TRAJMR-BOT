@@ -46,7 +46,7 @@
     const getRandomStepDelay = () => Math.floor(Math.random() * (7000 - 3000 + 1) + 3000);
 
     const checkLicense = () => {
-        if (get('activated') === 'true') return true;
+        if (get('activated-2') === 'true') return true;
         let trialStart = get('trial_start');
         if (!trialStart) { trialStart = Date.now(); save('trial_start', trialStart); }
         if ((Date.now() - trialStart) / 1000 > 180) { showLockScreen(); return false; }
