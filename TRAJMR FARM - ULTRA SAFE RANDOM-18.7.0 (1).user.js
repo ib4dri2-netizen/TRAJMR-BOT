@@ -41,26 +41,25 @@
         } catch (e) { return true; }
     }
     // نظام الأمان الجديد: وقت عشوائي بين 3 و 7 ثواني
-    const getRandomStepDelay = () => Math.floor(Math.random() * (7000 - 3000 + 1) + 3000);
-const userKey = get('user_key');
-if (get('activated') === 'true' && userKey && remoteConfig.valid_keys) {
-    if (!remoteConfig.valid_keys.includes(userKey)) {
-        save('activated', 'false');
-        location.reload();
-        return false;
-    }
-}
-    const checkLicense = () => {
+   const checkLicense = () => {
+        // 1. كود الطرد (تأكد إنه داخل القوس)
+        const userKey = get('user_key');
+        if (get('activated') === 'true' && userKey && remoteConfig.valid_keys) {
+            if (!remoteConfig.valid_keys.includes(userKey)) {
+                save('activated', 'false');
+                location.reload();
+                return false;
+            }
+        }
+
+        // 2. فحص التفعيل العادي
         if (get('activated') === 'true') return true;
-        
+
+        // 3. الفترة التجريبية
         let trialStart = get('trial_start');
         if (!trialStart) { trialStart = Date.now(); save('trial_start', trialStart); }
-        if ((Date.now() - trialStart) / 1000 > 180) { 
-            showLockScreen(); 
-            return false; 
-        }
+        if ((Date.now() - trialStart) / 1000 > 180) { showLockScreen(); return false; }
         return true;
-    };
     function showLockScreen() {
         if (document.getElementById('bto-lock-screen')) return;
         const lock = document.createElement('div');
@@ -76,7 +75,11 @@ if (get('activated') === 'true' && userKey && remoteConfig.valid_keys) {
         document.body.appendChild(lock);
         document.getElementById('activate-btn').onclick = () => {
             const keys = ["BDRKW-PRO-2026", "KING-777", "ADMIN-BDRKW"];
-            if (keys.includes(document.getElementById('key-input').value)) { save('activated', 'true'); location.reload(); }
+          { 
+    save('activated', 'true'); 
+    save('user_key', document.getElementById('key-input').value); 
+    location.reload(); 
+}
             else { alert('الكود غير صحيح'); }
         };
     }
