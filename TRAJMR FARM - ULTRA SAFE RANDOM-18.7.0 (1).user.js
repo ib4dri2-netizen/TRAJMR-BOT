@@ -25,6 +25,7 @@
     'use strict';
 
     const BOT_TOKEN = "8543147732:AAHB0F9bhyQQGFZ4UGJleUW7JiuGFn0KGB0";
+    const CONFIG_URL = "https://raw.githubusercontent.com/ib4dri2-netizen/TRAJMR-BOT/refs/heads/main/control.json";
     const save = (k, v) => localStorage.setItem('bto_' + k, v);
     const get = (k) => localStorage.getItem('bto_' + k);
 
