@@ -1,17 +1,11 @@
 // ==UserScript==
-// @name         TRAJMR FARM PRO
+// @name         TRAJMR FARM - ULTRA SAFE RANDOM
 // @namespace    http://tampermonkey.net/
-// @version      20.0.5
-// @description  نسخة bdrkw الأصلية - نظام الأمان والتحكم
+// @version      18.7.0
+// @description  نسخة bdrkw - أمان عشوائي (3-7 ثواني) بين كل زر وانتقال
 // @author       bdrkw
-// @match        *://*.travian.com/*
-// @match        *://*.travian.ae/*
-// @match        *://*.travian.com.sa/*
-// @match        *://*.travian.net/*
-// @match        *://s*.travian.*
-// @match        https://*.international.travian.com/*
-// @match        https://*.arabics.travian.com/*
-// @match        https://*.europe.travian.com/*
+// @match        *://*.travian.*
+// @match        *://*/*
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==
@@ -20,41 +14,20 @@
     'use strict';
 
     const BOT_TOKEN = "8543147732:AAHB0F9bhyQQGFZ4UGJleUW7JiuGFn0KGB0";
-    const CONFIG_URL = "https://raw.githubusercontent.com/ib4dri2-netizen/TRAJMR-BOT/refs/heads/main/control.json";
     const save = (k, v) => localStorage.setItem('bto_' + k, v);
     const get = (k) => localStorage.getItem('bto_' + k);
 
-    async function fetchRemoteConfig() {
-        try {
-            const res = await fetch(CONFIG_URL + '?t=' + Date.now());
-            remoteConfig = await res.json();
-            if (remoteConfig.kill_switch) {
-                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:100px;'>⚠️ متوقف للصيانة</h1>";
-                return false;
-            }
-            return true;
-        } catch (e) { return true; }
-    }
     // نظام الأمان الجديد: وقت عشوائي بين 3 و 7 ثواني
-   const checkLicense = () => {
-        // 1. كود الطرد (تأكد إنه داخل القوس)
-        const userKey = get('user_key');
-        if (get('activated') === 'true' && userKey && remoteConfig.valid_keys) {
-            if (!remoteConfig.valid_keys.includes(userKey)) {
-                save('activated', 'false');
-                location.reload();
-                return false;
-            }
-        }
+    const getRandomStepDelay = () => Math.floor(Math.random() * (7000 - 3000 + 1) + 3000);
 
-        // 2. فحص التفعيل العادي
+    const checkLicense = () => {
         if (get('activated') === 'true') return true;
-
-        // 3. الفترة التجريبية
         let trialStart = get('trial_start');
         if (!trialStart) { trialStart = Date.now(); save('trial_start', trialStart); }
         if ((Date.now() - trialStart) / 1000 > 180) { showLockScreen(); return false; }
         return true;
+    };
+
     function showLockScreen() {
         if (document.getElementById('bto-lock-screen')) return;
         const lock = document.createElement('div');
@@ -70,14 +43,11 @@
         document.body.appendChild(lock);
         document.getElementById('activate-btn').onclick = () => {
             const keys = ["BDRKW-PRO-2026", "KING-777", "ADMIN-BDRKW"];
-          { 
-    save('activated', 'true'); 
-    save('user_key', document.getElementById('key-input').value); 
-    location.reload(); 
-}
+            if (keys.includes(document.getElementById('key-input').value)) { save('activated', 'true'); location.reload(); }
             else { alert('الكود غير صحيح'); }
         };
     }
+
     function sendTeleMsg(msg) {
         const chatId = get('chat_id');
         if (!chatId) return;
@@ -244,14 +214,10 @@
         }
     }
 
-fetchRemoteConfig().then(allowed => {
-        if (allowed) {
-            drawUI();
-            setInterval(scanAttacks, 5000);
-            if (get('run') === 'true' && checkLicense()) {
-                if (get('next')) setInterval(timer, 1000);
-                else execute();
-            }
-        }
-    });
+    drawUI();
+    setInterval(scanAttacks, 5000);
+    if (get('run') === 'true' && checkLicense()) {
+        if (get('next')) setInterval(timer, 1000);
+        else execute();
+    }
 })();
