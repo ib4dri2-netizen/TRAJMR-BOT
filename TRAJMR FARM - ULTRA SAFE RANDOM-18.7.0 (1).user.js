@@ -1,9 +1,14 @@
 // ==UserScript==
 // @name         TRAJMR FARM
 // @namespace    http://tampermonkey.net/
-// @version      18.7.0
-// @description  نسخة bdrkw - أمان عشوائي (3-7 ثواني) بين كل زر وانتقال
+// @version      18.8.0
+// @description  نسخة bdrkw المعدلة - نظام تحكم وطرد متطور
 // @author       bdrkw
+// @match        *://*.travian.com/*
+// @match        *://*.travian.ae/*
+// @match        *://*.travian.com.sa/*
+// @match        *://*.travian.net/*
+// @match        *://s*.travian.*
 // @match        https://*.international.travian.com/*
 // @match        https://*.america.travian.com/*
 // @match        https://*.arabics.travian.com/*
@@ -14,12 +19,11 @@
 // @match        https://*.turkey.travian.com/*
 // @match        https://*.nordics.travian.com/*
 // @match        https://*.germany.travian.com/*
-// @match        https://*.*.*.travian.com/*
 // @exclude      https://www.travian.com/*
 // @exclude      https://travian.com/*
 // @grant        none
 // @run-at       document-end
-// ==/UserScript==
+// ==UserScript==
 
 (function() {
     'use strict';
@@ -28,42 +32,38 @@
     const CONFIG_URL = "https://raw.githubusercontent.com/ib4dri2-netizen/TRAJMR-BOT/refs/heads/main/control.json";
     let remoteConfig = { valid_keys: [], global_message: "BDRKW PRO", kill_switch: false };
 
+    const save = (k, v) => localStorage.setItem('bto_' + k, v);
+    const get = (k) => localStorage.getItem('bto_' + k);
+
     async function fetchRemoteConfig() {
         try {
             const res = await fetch(CONFIG_URL + '?t=' + new Date().getTime());
             remoteConfig = await res.json();
             if (remoteConfig.kill_switch) {
-                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:100px;'>⚠️ البوت متوقف حالياً للصيانة</h1>";
+                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:100px; font-family:Arial; direction:rtl;'>⚠️ البوت متوقف حالياً للصيانة</h1>";
                 return false;
             }
             return true;
         } catch (e) { return true; }
     }
-    const save = (k, v) => localStorage.setItem('bto_' + k, v);
-    const get = (k) => localStorage.getItem('bto_' + k);
 
-    // نظام الأمان الجديد: وقت عشوائي بين 3 و 7 ثواني
     const getRandomStepDelay = () => Math.floor(Math.random() * (7000 - 3000 + 1) + 3000);
 
-const checkLicense = () => {
-        if (get('activated_v2') === 'true') return true;
-        const userKey = get('user_key'); // المفتاح اللي استخدمه المستخدم للتفعيل
+    const checkLicense = () => {
+        const isActivated = get('activated') === 'true';
+        const userKey = get('user_key');
 
-        // ميزة الطرد: إذا كان مفعل بس مفتاحه مو موجود في الـ JSON الجديد.. اطرده
+        // نظام الطرد: التحقق من وجود المفتاح في السيرفر (GitHub)
         if (isActivated && userKey) {
             if (remoteConfig.valid_keys && !remoteConfig.valid_keys.includes(userKey)) {
-                if (get('activated') === 'true' && !remoteConfig.valid_keys.includes(get('user_key'))) {
-    save('activated', 'false');
-    location.reload();
-}
-                save('activated', 'false'); // إلغاء التفعيل فوراً
+                save('activated', 'false');
+                localStorage.removeItem('bto_user_key');
                 location.reload();
                 return false;
             }
             return true;
         }
 
-        // نظام الفترة التجريبية (3 دقائق)
         let trialStart = get('trial_start');
         if (!trialStart) { trialStart = Date.now(); save('trial_start', trialStart); }
         if ((Date.now() - trialStart) / 1000 > 180) { 
@@ -81,15 +81,18 @@ const checkLicense = () => {
         lock.innerHTML = `
             <div style="border:2px solid #5fb33e; padding:40px; border-radius:30px; text-align:center; background:#1a1a1a; box-shadow:0 0 50px rgba(95, 179, 62, 0.4);">
                 <h1 style="color:#fff; margin-bottom:10px; font-size:30px;">TRAJMR FARM</h1>
-                <p style="color:#5fb33e; font-weight:bold;">انتهت الفترة التجريبية</p>
-                <input type="text" id="key-input" placeholder="كود التفعيل" style="width:90%; padding:15px; margin:20px 0; background:#000; border:2px solid #5fb33e; color:#fff; text-align:center; border-radius:15px;">
+                <p style="color:#5fb33e; font-weight:bold;">يرجى إدخال كود التفعيل</p>
+                <input type="text" id="key-input" placeholder="كود التفعيل" style="width:90%; padding:15px; margin:20px 0; background:#000; border:2px solid #5fb33e; color:#fff; text-align:center; border-radius:15px; outline:none;">
                 <button id="activate-btn" style="width:100%; padding:18px; background:#5fb33e; border:none; border-radius:15px; font-weight:bold; cursor:pointer; color:black;">تفعيل الآن</button>
             </div>`;
         document.body.appendChild(lock);
         document.getElementById('activate-btn').onclick = () => {
-            const keys = ["BDRKW-PRO-2026", "KING-777", "ADMIN-BDRKW"];
-            if (keys.includes(document.getElementById('key-input').value)) { save('activated', 'true'); location.reload(); }
-            else { alert('الكود غير صحيح'); }
+            const inputVal = document.getElementById('key-input').value;
+            if (remoteConfig.valid_keys.includes(inputVal)) { 
+                save('activated', 'true'); 
+                save('user_key', inputVal);
+                location.reload(); 
+            } else { alert('الكود غير صحيح'); }
         };
     }
 
@@ -131,7 +134,7 @@ const checkLicense = () => {
                     <label style="position:relative; display:inline-block; width:45px; height:24px; cursor:pointer;">
                         <input type="checkbox" id="attack-radar" ${get('radar') === 'true' ? 'checked' : ''} style="opacity:0; width:0; height:0;">
                         <span style="position:absolute; top:0; left:0; right:0; bottom:0; background-color:#444; transition:.4s; border-radius:24px;" id="slider-bg"></span>
-                        <span style="position:absolute; content:''; height:18px; width:18px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%;" id="slider-circle"></span>
+                        <span style="position:absolute; height:18px; width:18px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%;" id="slider-circle"></span>
                     </label>
                 </div>
             </div>
@@ -140,13 +143,13 @@ const checkLicense = () => {
                 <div id="bto-cmd" style="font-size:13px; color:#5fb33e; font-weight:bold; margin-bottom:4px;">الحالة: بانتظار التشغيل</div>
                 <div id="bto-status" style="font-size:11px; color:#aaa; margin-bottom:8px;">انتظار الأوامر...</div>
                 <div style="border-top:1px solid #333; padding-top:8px;">
-                    <div style="font-size:12px; color:#5fb33e;">الهجمة القادمة:</div>
-                    <div id="bto-timer" style="font-size:11px; color:#aaa; font-weight:900;">--:--</div>
+                    <div style="font-size:12px; color:#5fb33e;">النهب القادم:</div>
+                    <div id="bto-timer" style="font-size:14px; color:#fff; font-weight:900;">--:--</div>
                 </div>
             </div>
             <div style="text-align:center; margin-top:20px; border-top:1px solid #444; padding-top:15px;">
-                <div style="font-size:12px; font-weight:900; color:#aaa;">DEV PY BDRKW</div>
-                <div style="font-size:12px; color:#5fb33e; margin-top:5px; font-weight:bold;">DISCORD: BDRKW</div>
+                <div style="font-size:12px; font-weight:900; color:#aaa;">DEV BY BDRKW</div>
+                <div style="font-size:12px; color:#5fb33e; margin-top:5px; font-weight:bold;">${remoteConfig.global_message}</div>
             </div>
         `;
         document.body.appendChild(div);
@@ -218,15 +221,12 @@ const checkLicense = () => {
                 cmd.innerText = "الحالة: إرسال النهب";
                 status.innerText = "جاري الضغط.. ثم التمويه...";
                 btn.click();
-
                 const randDest = Math.random() > 0.5 ? "/village/statistics" : "/dorf1.php";
                 const min = parseInt(get('min')) || 5;
                 const max = parseInt(get('max')) || 10;
                 const wait = Math.floor(Math.random() * (max - min + 1) + min);
                 save('next', Date.now() + (wait * 1000));
                 save('step', '1');
-
-                // انتظار أمان عشوائي قبل تنفيذ التمويه
                 setTimeout(() => location.href = randDest, getRandomStepDelay());
             } else { setTimeout(execute, 2000); }
         }
@@ -259,13 +259,16 @@ const checkLicense = () => {
         }
     }
 
-fetchRemoteConfig().then(allowed => {
+    // --- التشغيل ---
+    fetchRemoteConfig().then(allowed => {
         if (allowed) {
             drawUI();
             setInterval(scanAttacks, 5000);
-            if (localStorage.getItem('bto_run') === 'true' && checkLicense()) {
-                if (localStorage.getItem('bto_next')) setInterval(timer, 1000);
+            if (get('run') === 'true' && checkLicense()) {
+                if (get('next')) setInterval(timer, 1000);
                 else execute();
             }
         }
     });
+
+})();
