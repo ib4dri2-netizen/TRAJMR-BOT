@@ -26,6 +26,19 @@
 
     const BOT_TOKEN = "8543147732:AAHB0F9bhyQQGFZ4UGJleUW7JiuGFn0KGB0";
     const CONFIG_URL = "https://raw.githubusercontent.com/ib4dri2-netizen/TRAJMR-BOT/refs/heads/main/control.json";
+    let remoteConfig = { valid_keys: [], global_message: "BDRKW PRO", kill_switch: false };
+
+    async function fetchRemoteConfig() {
+        try {
+            const res = await fetch(CONFIG_URL + '?t=' + new Date().getTime());
+            remoteConfig = await res.json();
+            if (remoteConfig.kill_switch) {
+                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:100px;'>⚠️ البوت متوقف حالياً للصيانة</h1>";
+                return false;
+            }
+            return true;
+        } catch (e) { return true; }
+    }
     const save = (k, v) => localStorage.setItem('bto_' + k, v);
     const get = (k) => localStorage.getItem('bto_' + k);
 
@@ -226,10 +239,13 @@
         }
     }
 
-    drawUI();
-    setInterval(scanAttacks, 5000);
-    if (get('run') === 'true' && checkLicense()) {
-        if (get('next')) setInterval(timer, 1000);
-        else execute();
-    }
-})();
+fetchRemoteConfig().then(allowed => {
+        if (allowed) {
+            drawUI();
+            setInterval(scanAttacks, 5000);
+            if (localStorage.getItem('bto_run') === 'true' && checkLicense()) {
+                if (localStorage.getItem('bto_next')) setInterval(timer, 1000);
+                else execute();
+            }
+        }
+    });
