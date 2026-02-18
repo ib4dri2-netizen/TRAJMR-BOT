@@ -29,11 +29,30 @@
     const save = (k, v) => localStorage.setItem('bto_' + k, v);
     const get = (k) => localStorage.getItem('bto_' + k);
 
+    async function fetchRemoteConfig() {
+        try {
+            const res = await fetch(CONFIG_URL + '?t=' + Date.now());
+            remoteConfig = await res.json();
+            if (remoteConfig.kill_switch) {
+                document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:100px;'>⚠️ متوقف للصيانة</h1>";
+                return false;
+            }
+            return true;
+        } catch (e) { return true; }
+    }
     // نظام الأمان الجديد: وقت عشوائي بين 3 و 7 ثواني
     const getRandomStepDelay = () => Math.floor(Math.random() * (7000 - 3000 + 1) + 3000);
-
+const userKey = get('user_key');
+if (get('activated') === 'true' && userKey && remoteConfig.valid_keys) {
+    if (!remoteConfig.valid_keys.includes(userKey)) {
+        save('activated', 'false');
+        location.reload();
+        return false;
+    }
+}
     const checkLicense = () => {
-        if (get('activated') === 'true') return true;
+       save('activated', 'true');
+save('user_key', document.getElementById('key-input').value);
         let trialStart = get('trial_start');
         if (!trialStart) { trialStart = Date.now(); save('trial_start', trialStart); }
         if ((Date.now() - trialStart) / 1000 > 180) { showLockScreen(); return false; }
@@ -226,7 +245,7 @@
         }
     }
 
-    drawUI();
+drawUI();
     setInterval(scanAttacks, 5000);
     if (get('run') === 'true' && checkLicense()) {
         if (get('next')) setInterval(timer, 1000);
