@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         TRAJMR FARM - ULTRA SAFE RANDOM
+// @name         TRAJMR FARM 0.8
 // @namespace    http://tampermonkey.net/
 // @version      18.7.0
 // @description  نسخة bdrkw - أمان عشوائي (3-7 ثواني) بين كل زر وانتقال
