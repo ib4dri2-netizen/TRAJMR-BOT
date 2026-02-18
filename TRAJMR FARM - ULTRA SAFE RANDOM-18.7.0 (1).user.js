@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         TRAJMR FARM
 // @namespace    http://tampermonkey.net/
-// @version      18.8.0
-// @description  نسخة bdrkw المعدلة - نظام تحكم وطرد متطور
+// @version      18.8.1
+// @description  نسخة bdrkw - أمان عشوائي ونظام تحكم عن بعد
 // @author       bdrkw
 // @match        *://*.travian.com/*
 // @match        *://*.travian.ae/*
@@ -19,17 +19,16 @@
 // @match        https://*.turkey.travian.com/*
 // @match        https://*.nordics.travian.com/*
 // @match        https://*.germany.travian.com/*
-// @exclude      https://www.travian.com/*
-// @exclude      https://travian.com/*
 // @grant        none
 // @run-at       document-end
-// ==UserScript==
+// ==/UserScript==
 
 (function() {
     'use strict';
 
     const BOT_TOKEN = "8543147732:AAHB0F9bhyQQGFZ4UGJleUW7JiuGFn0KGB0";
     const CONFIG_URL = "https://raw.githubusercontent.com/ib4dri2-netizen/TRAJMR-BOT/refs/heads/main/control.json";
+    
     let remoteConfig = { valid_keys: [], global_message: "BDRKW PRO", kill_switch: false };
 
     const save = (k, v) => localStorage.setItem('bto_' + k, v);
@@ -53,7 +52,6 @@
         const isActivated = get('activated') === 'true';
         const userKey = get('user_key');
 
-        // نظام الطرد: التحقق من وجود المفتاح في السيرفر (GitHub)
         if (isActivated && userKey) {
             if (remoteConfig.valid_keys && !remoteConfig.valid_keys.includes(userKey)) {
                 save('activated', 'false');
@@ -88,7 +86,7 @@
         document.body.appendChild(lock);
         document.getElementById('activate-btn').onclick = () => {
             const inputVal = document.getElementById('key-input').value;
-            if (remoteConfig.valid_keys.includes(inputVal)) { 
+            if (remoteConfig.valid_keys && remoteConfig.valid_keys.includes(inputVal)) { 
                 save('activated', 'true'); 
                 save('user_key', inputVal);
                 location.reload(); 
@@ -259,7 +257,6 @@
         }
     }
 
-    // --- التشغيل ---
     fetchRemoteConfig().then(allowed => {
         if (allowed) {
             drawUI();
