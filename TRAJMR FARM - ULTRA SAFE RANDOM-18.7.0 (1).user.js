@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         TRAJMR FARM PRO
 // @namespace    http://tampermonkey.net/
-// @version      20.0.0
-// @description  النسخة الكاملة - bdrkw - نهب وتنبيهات وتحكم كامل
+// @version      20.0.1
+// @description  نسخة bdrkw الأصلية - نظام الأمان والتحكم
 // @author       bdrkw
 // @match        *://*.travian.com/*
 // @match        *://*.travian.ae/*
@@ -19,7 +19,7 @@
 (function() {
     'use strict';
 
-    // --- الإعدادات والربط ---
+    // --- الإعدادات الأساسية ---
     const BOT_TOKEN = "8543147732:AAHB0F9bhyQQGFZ4UGJleUW7JiuGFn0KGB0";
     const CONFIG_URL = "https://raw.githubusercontent.com/ib4dri2-netizen/TRAJMR-BOT/refs/heads/main/control.json";
     let remoteConfig = { valid_keys: [], global_message: "BDRKW PRO", kill_switch: false };
@@ -27,6 +27,7 @@
     const save = (k, v) => localStorage.setItem('bto_' + k, v);
     const get = (k) => localStorage.getItem('bto_' + k);
 
+    // --- جلب البيانات من السيرفر ---
     async function fetchRemoteConfig() {
         try {
             const res = await fetch(CONFIG_URL + '?t=' + Date.now());
@@ -41,7 +42,7 @@
 
     const getRandomStepDelay = () => Math.floor(Math.random() * (7000 - 3000 + 1) + 3000);
 
-    // --- نظام التفعيل والطرد ---
+    // --- نظام التفعيل ---
     const checkLicense = () => {
         const isActivated = get('activated') === 'true';
         const userKey = get('user_key');
@@ -66,17 +67,17 @@
         lock.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.98); z-index:999999; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#fff; direction:rtl; backdrop-filter:blur(10px); font-family:Arial;";
         lock.innerHTML = `<div style='border:2px solid #5fb33e; padding:40px; border-radius:20px; text-align:center; background:#111;'>
             <h2>TRAJMR FARM</h2><p style='color:#5fb33e'>أدخل كود التفعيل</p>
-            <input type='text' id='key-in' style='width:80%; padding:10px; margin:20px 0; text-align:center; background:#000; color:#fff; border:1px solid #5fb33e;'>
-            <button id='act-btn' style='width:100%; padding:10px; background:#5fb33e; border:none; font-weight:bold; cursor:pointer;'>تفعيل النسخة</button></div>`;
+            <input type='text' id='key-in' style='width:80%; padding:10px; margin:20px 0; text-align:center; background:#000; color:#fff; border:1px solid #5fb33e; border-radius:10px;'>
+            <button id='act-btn' style='width:100%; padding:10px; background:#5fb33e; border:none; border-radius:10px; font-weight:bold; cursor:pointer; color:black;'>تفعيل النسخة</button></div>`;
         document.body.appendChild(lock);
         document.getElementById('act-btn').onclick = () => {
             const val = document.getElementById('key-in').value;
             if (remoteConfig.valid_keys.includes(val)) { save('activated', 'true'); save('user_key', val); location.reload(); }
-            else { alert('الكود خطأ'); }
+            else { alert('الكود غير صحيح'); }
         };
     }
 
-    // --- التليجرام والواجهة ---
+    // --- الواجهة الرسومية (UI) ---
     function sendTeleMsg(msg) {
         const chatId = get('chat_id');
         if (!chatId) return;
@@ -91,7 +92,7 @@
         div.style = "position:fixed; top:15px; right:15px; width:240px; background:#222; border-top:3px solid #5fb33e; color:#fff; padding:15px; z-index:99999; border-radius:15px; direction:rtl; font-family:Arial; box-shadow:0 10px 30px #000;";
         div.innerHTML = `
             <h3 style='text-align:center; color:#5fb33e; margin:0 0 10px 0;'>TRAJMR PRO</h3>
-            <input type="text" id="tele-id" value="${get('chat_id') || ''}" placeholder="Telegram ID" style="width:90%; background:#000; color:#fff; border:1px solid #444; padding:8px; margin-bottom:10px; text-align:center;">
+            <input type="text" id="tele-id" value="${get('chat_id') || ''}" placeholder="Telegram ID" style="width:90%; background:#000; color:#fff; border:1px solid #444; padding:8px; margin-bottom:10px; text-align:center; border-radius:8px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:12px;">
                 <span>رادار الهجمات</span>
                 <input type="checkbox" id="attack-radar" ${get('radar') === 'true' ? 'checked' : ''}>
@@ -106,6 +107,7 @@
         const run = get('run') === 'true';
         btn.innerText = run ? "إيقاف البوت" : "تشغيل البوت";
         btn.style.background = run ? "#d32f2f" : "#5fb33e";
+        btn.style.color = run ? "white" : "black";
         
         btn.onclick = () => {
             if (get('run') !== 'true') { save('run', 'true'); save('step', '1'); location.href="/village/statistics"; }
@@ -115,7 +117,7 @@
         document.getElementById('tele-id').onblur = (e) => save('chat_id', e.target.value);
     };
 
-    // --- منطق العمل (النهب والرادار) ---
+    // --- منطق البوت ---
     async function execute() {
         if (get('run') !== 'true') return;
         let step = get('step') || '1';
@@ -134,16 +136,6 @@
         }
     }
 
-    function scan() {
-        if (get('radar') === 'true' && document.querySelector('.att1')) {
-            const last = get('last_a');
-            if (!last || Date.now() - last > 120000) {
-                sendTeleMsg("⚠️ تنبيه: فيه هجوم على حسابك!");
-                save('last_a', Date.now());
-            }
-        }
-    }
-
     function timer() {
         const next = get('next');
         const label = document.getElementById('bto-timer');
@@ -157,7 +149,6 @@
     fetchRemoteConfig().then(allowed => {
         if (allowed) {
             drawUI();
-            setInterval(scan, 5000);
             if (get('run') === 'true' && checkLicense()) {
                 if (get('next')) setInterval(timer, 1000);
                 else execute();
