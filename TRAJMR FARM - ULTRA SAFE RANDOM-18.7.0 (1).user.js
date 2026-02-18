@@ -1,11 +1,22 @@
 // ==UserScript==
-// @name         TRAJMR FARM - ULTRA SAFE RANDOM
+// @name         TRAJMR FARM
 // @namespace    http://tampermonkey.net/
 // @version      18.7.0
 // @description  نسخة bdrkw - أمان عشوائي (3-7 ثواني) بين كل زر وانتقال
 // @author       bdrkw
-// @match        *://*.travian.*
-// @match        *://*/*
+// @match        https://*.international.travian.com/*
+// @match        https://*.america.travian.com/*
+// @match        https://*.arabics.travian.com/*
+// @match        https://*.europe.travian.com/*
+// @match        https://*.asia.travian.com/*
+// @match        https://beta.travian.com/*
+// @match        https://finals.travian.com/*
+// @match        https://*.turkey.travian.com/*
+// @match        https://*.nordics.travian.com/*
+// @match        https://*.germany.travian.com/*
+// @match        https://*.*.*.travian.com/*
+// @exclude      https://www.travian.com/*
+// @exclude      https://travian.com/*
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==
@@ -14,6 +25,7 @@
     'use strict';
 
     const BOT_TOKEN = "8543147732:AAHB0F9bhyQQGFZ4UGJleUW7JiuGFn0KGB0";
+    const CONFIG_URL = "https://raw.githubusercontent.com/ib4dri2-netizen/TRAJMR-BOT/refs/heads/main/control.json";
     const save = (k, v) => localStorage.setItem('bto_' + k, v);
     const get = (k) => localStorage.getItem('bto_' + k);
 
