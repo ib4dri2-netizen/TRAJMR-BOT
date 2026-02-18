@@ -1,22 +1,17 @@
 // ==UserScript==
-// @name         TRAJMR FARM
+// @name         TRAJMR FARM PRO
 // @namespace    http://tampermonkey.net/
-// @version      18.7.0
-// @description  نسخة bdrkw - أمان عشوائي (3-7 ثواني) بين كل زر وانتقال
+// @version      20.0.5
+// @description  نسخة bdrkw الأصلية - نظام الأمان والتحكم
 // @author       bdrkw
+// @match        *://*.travian.com/*
+// @match        *://*.travian.ae/*
+// @match        *://*.travian.com.sa/*
+// @match        *://*.travian.net/*
+// @match        *://s*.travian.*
 // @match        https://*.international.travian.com/*
-// @match        https://*.america.travian.com/*
 // @match        https://*.arabics.travian.com/*
 // @match        https://*.europe.travian.com/*
-// @match        https://*.asia.travian.com/*
-// @match        https://beta.travian.com/*
-// @match        https://finals.travian.com/*
-// @match        https://*.turkey.travian.com/*
-// @match        https://*.nordics.travian.com/*
-// @match        https://*.germany.travian.com/*
-// @match        https://*.*.*.travian.com/*
-// @exclude      https://www.travian.com/*
-// @exclude      https://travian.com/*
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==
@@ -259,3 +254,4 @@ fetchRemoteConfig().then(allowed => {
             }
         }
     });
+})();
