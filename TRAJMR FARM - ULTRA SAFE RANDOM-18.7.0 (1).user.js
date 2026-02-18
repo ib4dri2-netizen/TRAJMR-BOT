@@ -42,7 +42,7 @@
             </div>`;
         document.body.appendChild(lock);
         document.getElementById('activate-btn').onclick = () => {
-            const keys = ["BDRKW-PRO-2026", "KING-777", "ADMIN-BDRKW"];
+            const keys = ["BDR1", "BDR2", "BDR3"];
             if (keys.includes(document.getElementById('key-input').value)) { save('activated', 'true'); location.reload(); }
             else { alert('الكود غير صحيح'); }
         };
