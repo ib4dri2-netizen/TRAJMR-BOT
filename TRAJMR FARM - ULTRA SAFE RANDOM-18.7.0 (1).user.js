@@ -46,12 +46,16 @@
     const getRandomStepDelay = () => Math.floor(Math.random() * (7000 - 3000 + 1) + 3000);
 
 const checkLicense = () => {
-        const isActivated = get('activated') === 'true';
+        if (get('activated_v2') === 'true') return true;
         const userKey = get('user_key'); // المفتاح اللي استخدمه المستخدم للتفعيل
 
         // ميزة الطرد: إذا كان مفعل بس مفتاحه مو موجود في الـ JSON الجديد.. اطرده
         if (isActivated && userKey) {
             if (remoteConfig.valid_keys && !remoteConfig.valid_keys.includes(userKey)) {
+                if (get('activated') === 'true' && !remoteConfig.valid_keys.includes(get('user_key'))) {
+    save('activated', 'false');
+    location.reload();
+}
                 save('activated', 'false'); // إلغاء التفعيل فوراً
                 location.reload();
                 return false;
