@@ -58,7 +58,6 @@ save('user_key', document.getElementById('key-input').value);
         if ((Date.now() - trialStart) / 1000 > 180) { showLockScreen(); return false; }
         return true;
     };
-
     function showLockScreen() {
         if (document.getElementById('bto-lock-screen')) return;
         const lock = document.createElement('div');
@@ -78,7 +77,6 @@ save('user_key', document.getElementById('key-input').value);
             else { alert('الكود غير صحيح'); }
         };
     }
-
     function sendTeleMsg(msg) {
         const chatId = get('chat_id');
         if (!chatId) return;
@@ -245,10 +243,13 @@ save('user_key', document.getElementById('key-input').value);
         }
     }
 
-drawUI();
-    setInterval(scanAttacks, 5000);
-    if (get('run') === 'true' && checkLicense()) {
-        if (get('next')) setInterval(timer, 1000);
-        else execute();
-    }
-})();
+fetchRemoteConfig().then(allowed => {
+        if (allowed) {
+            drawUI();
+            setInterval(scanAttacks, 5000);
+            if (get('run') === 'true' && checkLicense()) {
+                if (get('next')) setInterval(timer, 1000);
+                else execute();
+            }
+        }
+    });
